@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCAN - Smart Canteen Access Network</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --dark-green: #1a472a;
+            --medium-green: #2d5a3c;
+            --light-green: #3a7d54;
+            --black: #121212;
+            --white: #ffffff;
+            --light-gray: #f5f5f5;
+            --gray: #e0e0e0;
+            --accent: #4caf50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-gray);
+            color: var(--black);
+            line-height: 1.6;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--dark-green);
+            color: var(--white);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 0.5rem 0;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: var(--gray);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--white);
+            transition: width 0.3s;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .user-actions button {
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+            position: relative;
+        }
+
+        .user-actions button:hover {
+            transform: scale(1.1);
+        }
+
+        .cart-count {
+            background-color: var(--accent);
+            color: var(--white);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(26, 71, 42, 0.8), rgba(26, 71, 42, 0.9)), url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80');
+            background-size: cover;
+            background-position: center;
+            color: var(--white);
+            padding: 5rem 2rem;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .cta-button {
+            background-color: var(--accent);
+            color: var(--white);
+            border: none;
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            font-weight: 600;
+        }
+
+        .cta-button:hover {
+            background-color: #3d8b40;
+            transform: translateY(-3px);
+        }
+
+        /* About Section */
+        .about-section {
+            padding: 4rem 2rem;
+            background-color: var(--white);
+        }
+
+        .about-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .about-image {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .about-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .about-content h2 {
+            color: var(--dark-green);
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        .about-content p {
+            margin-bottom: 1rem;
+            color: #555;
+        }
+
+        /* Menu Section */
+        .menu-section {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--dark-green);
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background-color: var(--dark-green);
+            margin: 0.5rem auto;
+        }
+
+        .category-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .category-tab {
+            background-color: var(--white);
+            border: 2px solid var(--dark-green);
+            color: var(--dark-green);
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .category-tab.active {
+            background-color: var(--dark-green);
+            color: var(--white);
+        }
+
+        .category-tab:hover:not(.active) {
+            background-color: var(--light-green);
+            color: var(--white);
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .menu-item {
+            background-color: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .menu-item-image {
+            height: 180px;
+            width: 100%;
+            background-color: var(--gray);
+            background-size: cover;
+            background-position: center;
+        }
+
+        .menu-item-content {
+            padding: 1.5rem;
+        }
+
+        .menu-item-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark-green);
+        }
+
+        .menu-item-description {
+            color: #666;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .menu-item-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-item-price {
+            font-weight: 700;
+            color: var(--dark-green);
+            font-size: 1.1rem;
+        }
+
+        .add-to-cart {
+            background-color: var(--dark-green);
+            color: var(--white);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .add-to-cart:hover {
+            background-color: var(--light-green);
+        }
+
+        /* Contact Section */
+        .contact-section {
+            padding: 4rem 2rem;
+            background-color: var(--white);
+        }
+
+        .contact-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .contact-info h3 {
+            color: var(--dark-green);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .contact-details {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .contact-detail {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .contact-detail i {
+            width: 40px;
+            height: 40px;
+            background-color: var(--light-green);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Cart Sidebar */
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 380px;
+            height: 100vh;
+            background-color: var(--white);
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            transition: right 0.4s ease-in-out;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-sidebar.active {
+            right: 0;
+        }
+
+        .cart-header {
+            background-color: var(--dark-green);
+            color: var(--white);
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-header h3 {
+            font-size: 1.3rem;
+        }
+
+        .close-cart {
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .cart-items {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .cart-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--gray);
+        }
+
+        .cart-item-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            background-color: var(--gray);
+            background-size: cover;
+            background-position: center;
+        }
+
+        .cart-item-details {
+            flex: 1;
+        }
+
+        .cart-item-title {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .cart-item-price {
+            color: var(--dark-green);
+            font-weight: 600;
+        }
+
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .quantity-btn {
+            background-color: var(--light-gray);
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .cart-item-quantity {
+            margin: 0 0.5rem;
+            font-weight: 600;
+        }
+
+        .remove-item {
+            color: #f44336;
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-left: auto;
+        }
+
+        .cart-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--gray);
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .checkout-btn {
+            background-color: var(--dark-green);
+            color: var(--white);
+            border: none;
+            width: 100%;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .checkout-btn:hover {
+            background-color: var(--light-green);
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .empty-cart i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--gray);
+        }
+
+        /* Payment Modal */
+        .payment-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .payment-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .payment-content {
+            background-color: var(--white);
+            width: 90%;
+            max-width: 400px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .payment-header {
+            background-color: var(--dark-green);
+            color: var(--white);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .payment-header h3 {
+            font-size: 1.3rem;
+        }
+
+        .payment-body {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .qris-container {
+            margin: 1rem 0 2rem;
+        }
+
+        .qris-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 10px;
+            border: 2px solid var(--gray);
+        }
+
+        .payment-instruction {
+            margin-bottom: 2rem;
+            color: #666;
+        }
+
+        .payment-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .payment-btn {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .cancel-btn {
+            background-color: var(--light-gray);
+            color: var(--black);
+        }
+
+        .pay-btn {
+            background-color: var(--dark-green);
+            color: var(--white);
+        }
+
+        .pay-btn:hover {
+            background-color: var(--light-green);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--black);
+            color: var(--white);
+            padding: 3rem 2rem 1.5rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: var(--light-green);
+        }
+
+        .footer-section p, .footer-section a {
+            color: #ccc;
+            margin-bottom: 0.8rem;
+            display: block;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: var(--white);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-links a {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+
+        .social-links a:hover {
+            background-color: var(--light-green);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid #333;
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav ul {
+                gap: 1rem;
+            }
+
+            .hero h2 {
+                font-size: 2rem;
+            }
+
+            .cart-sidebar {
+                width: 100%;
+                right: -100%;
+            }
+
+            .menu-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+
+            .about-container,
+            .contact-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .menu-item {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* Notification */
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(20px); }
+            20% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+
+        .notification {
+            animation: fadeInOut 3s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-utensils"></i>
+                <h1>SCAN Canteen</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#home">Beranda</a></li>
+                    <li><a href="#menu">Menu</a></li>
+                    <li><a href="#about">Tentang Kami</a></li>
+                    <li><a href="#contact">Kontak</a></li>
+                </ul>
+            </nav>
+            <div class="user-actions">
+                <button id="cart-btn" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </button>
+                <button id="user-btn"><i class="fas fa-user"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h2>Selamat Datang di SCAN Canteen</h2>
+            <p>Nikmati berbagai pilihan makanan dan minuman lezat dengan sistem pemesanan yang mudah dan cepat</p>
+            <button class="cta-button" id="order-now">Pesan Sekarang</button>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section" id="about">
+        <div class="about-container">
+            <div class="about-image">
+                <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80" alt="SCAN Canteen">
+            </div>
+            <div class="about-content">
+                <h2 class="section-title">Tentang SCAN Canteen</h2>
+                <p>SCAN (Smart Canteen Access Network) adalah inovasi sistem pemesanan makanan dan minuman yang dikembangkan oleh tim mahasiswa berkolaborasi dengan Kewirausahaan Teknik Kimia.</p>
+                <p>Kami menyediakan berbagai pilihan makanan dan minuman sehat dengan bahan-bahan berkualitas tinggi yang diolah secara higienis.</p>
+                <p>Dengan sistem pemesanan digital, kami memudahkan mahasiswa dan staff untuk menikmati makanan lezat tanpa harus antri lama.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section class="menu-section" id="menu">
+        <h2 class="section-title">Menu Kami</h2>
+        <div class="category-tabs">
+            <button class="category-tab active" data-category="all">Semua</button>
+            <button class="category-tab" data-category="makanan">Makanan</button>
+            <button class="category-tab" data-category="minuman">Minuman</button>
+            <button class="category-tab" data-category="snack">Snack</button>
+        </div>
+        <div class="menu-grid" id="menu-grid">
+            <!-- Menu items will be dynamically added here -->
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section" id="contact">
+        <div class="contact-container">
+            <div class="contact-info">
+                <h3>Kontak Kami</h3>
+                <div class="contact-details">
+                    <div class="contact-detail">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <strong>Alamat</strong>
+                            <p>Gedung Kewirausahaan Teknik Kimia<br>Kampus Universitas</p>
+                        </div>
+                    </div>
+                    <div class="contact-detail">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <strong>Telepon</strong>
+                            <p>(021) 1234-5678</p>
+                        </div>
+                    </div>
+                    <div class="contact-detail">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <strong>Email</strong>
+                            <p>info@scancanteen.com</p>
+                        </div>
+                    </div>
+                    <div class="contact-detail">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <strong>Jam Operasional</strong>
+                            <p>Senin - Jumat: 08.00 - 20.00<br>Sabtu - Minggu: 09.00 - 18.00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="contact-info">
+                <h3>Lokasi Kami</h3>
+                <div class="map-placeholder" style="background: linear-gradient(45deg, var(--light-gray), var(--gray)); height: 300px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--dark-green); font-weight: bold;">
+                    Peta Lokasi SCAN Canteen
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-header">
+            <h3>Keranjang Belanja</h3>
+            <button class="close-cart" id="close-cart">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="cart-items" id="cart-items">
+            <!-- Cart items will be dynamically added here -->
+            <div class="empty-cart">
+                <i class="fas fa-shopping-cart"></i>
+                <p>Keranjang belanja Anda kosong</p>
+            </div>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cart-total">Rp 0</span>
+            </div>
+            <button class="checkout-btn" id="checkout-btn">Checkout dengan QRIS</button>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="payment-modal" id="payment-modal">
+        <div class="payment-content">
+            <div class="payment-header">
+                <h3>Pembayaran QRIS</h3>
+            </div>
+            <div class="payment-body">
+                <div class="payment-instruction">
+                    <p>Scan QR code di bawah ini untuk melakukan pembayaran</p>
+                </div>
+                <div class="qris-container">
+                    <!-- GANTI DENGAN QR CODE ANDA -->
+                    <img src="images/qris-payment.png" alt="QRIS Payment" class="qris-image">
+                    <!-- JIKA BELUM ADA QR CODE, GUNAKAN YANG INI -->
+                    <!-- <div class="qris-code" style="background: linear-gradient(45deg, var(--dark-green), var(--light-green)); width: 200px; height: 200px; margin: 0 auto; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                        QRIS CODE
+                    </div> -->
+                </div>
+                <div class="payment-instruction">
+                    <p><strong>Total: <span id="payment-total">Rp 0</span></strong></p>
+                    <p style="font-size: 0.9rem; margin-top: 0.5rem;">Pembayaran akan diproses otomatis setelah scan</p>
+                </div>
+                <div class="payment-actions">
+                    <button class="payment-btn cancel-btn" id="cancel-payment">Batal</button>
+                    <button class="payment-btn pay-btn" id="confirm-payment">Sudah Bayar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Tentang SCAN</h3>
+                <p>SCAN (Smart Canteen Access Network) adalah sistem pemesanan makanan dan minuman yang bekerja sama dengan Kewirausahaan Teknik Kimia untuk memberikan pengalaman berbelanja yang mudah dan modern.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="#home">Beranda</a>
+                <a href="#menu">Menu</a>
+                <a href="#about">Tentang Kami</a>
+                <a href="#contact">Kontak</a>
+            </div>
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-tiktok"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 SCAN Canteen. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // =============================================
+        // BAGIAN INI YANG BISA ANDA UBAH-UBAH
+        // =============================================
+        
+        // Sample menu data - UBAH MENU DI SINI
+        const menuItems = [
+            {
+                id: 1,
+                name: "Nasi Goreng Spesial",
+                description: "Nasi goreng dengan ayam, udang, dan sayuran segar",
+                price: 25000,
+                category: "makanan",
+                image: "https://images.unsplash.com/photo-1630919554028-3a9ec150e58b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
+            },
+            {
+                id: 2,
+                name: "Mie Ayam Bakso",
+                description: "Mie ayam dengan bakso sapi pilihan dan pangsit goreng",
+                price: 20000,
+                category: "makanan",
+                image: "https://images.unsplash.com/photo-1612927601601-6638404737ce?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
+            },
+            {
+                id: 3,
+                name: "Ayam Geprek",
+                description: "Ayam crispy dengan sambal bawang yang pedas menggoda",
+                price: 22000,
+                category: "makanan",
+                image: "https://images.unsplash.com/photo-1562967914-608f82629710?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1173&q=80"
+            },
+            {
+                id: 4,
+                name: "Es Teh Manis",
+                description: "Es teh segar dengan gula pasir pilihan",
+                price: 8000,
+                category: "minuman",
+                image: "https://images.unsplash.com/photo-1597481499750-3e11b3df0da4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
+            },
+            {
+                id: 5,
+                name: "Jus Alpukat",
+                description: "Jus alpukat segar dengan susu dan gula aren",
+                price: 15000,
+                category: "minuman",
+                image: "https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=686&q=80"
+            },
+            {
+                id: 6,
+                name: "Kopi Latte",
+                description: "Kopi dengan susu steamed yang creamy",
+                price: 18000,
+                category: "minuman",
+                image: "https://images.unsplash.com/photo-1572442388796-11668a67e53d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=715&q=80"
+            },
+            {
+                id: 7,
+                name: "Kentang Goreng",
+                description: "Kentang goreng renyah dengan saus tomat dan mayones",
+                price: 12000,
+                category: "snack",
+                image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
+            },
+            {
+                id: 8,
+                name: "Pisang Goreng",
+                description: "Pisang goreng crispy dengan taburan gula dan keju",
+                price: 10000,
+                category: "snack",
+                image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
+            }
+        ];
+
+        // =============================================
+        // JANGAN UBAH KODE DI BAWAH INI
+        // KECUALI ANDA SUDAH PAHAM PEMROGRAMAN
+        // =============================================
+
+        // Cart functionality
+        let cart = [];
+
+        // DOM Elements
+        const menuGrid = document.getElementById('menu-grid');
+        const cartBtn = document.getElementById('cart-btn');
+        const closeCartBtn = document.getElementById('close-cart');
+        const cartSidebar = document.getElementById('cart-sidebar');
+        const cartItems = document.getElementById('cart-items');
+        const cartTotal = document.getElementById('cart-total');
+        const cartCount = document.querySelector('.cart-count');
+        const checkoutBtn = document.getElementById('checkout-btn');
+        const paymentModal = document.getElementById('payment-modal');
+        const cancelPaymentBtn = document.getElementById('cancel-payment');
+        const confirmPaymentBtn = document.getElementById('confirm-payment');
+        const categoryTabs = document.querySelectorAll('.category-tab');
+        const orderNowBtn = document.getElementById('order-now');
+        const paymentTotal = document.getElementById('payment-total');
+
+        // Initialize the menu
+        function initializeMenu() {
+            menuGrid.innerHTML = '';
+            menuItems.forEach(item => {
+                const menuItemElement = document.createElement('div');
+                menuItemElement.className = 'menu-item';
+                menuItemElement.dataset.category = item.category;
+                menuItemElement.innerHTML = `
+                    <div class="menu-item-image" style="background-image: url('${item.image}')"></div>
+                    <div class="menu-item-content">
+                        <h3 class="menu-item-title">${item.name}</h3>
+                        <p class="menu-item-description">${item.description}</p>
+                        <div class="menu-item-footer">
+                            <span class="menu-item-price">Rp ${item.price.toLocaleString('id-ID')}</span>
+                            <button class="add-to-cart" data-id="${item.id}">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                menuGrid.appendChild(menuItemElement);
+            });
+
+            // Add event listeners to add-to-cart buttons
+            document.querySelectorAll('.add-to-cart').forEach(button => {
+                button.addEventListener('click', function() {
+                    const itemId = parseInt(this.dataset.id);
+                    addToCart(itemId);
+                });
+            });
+        }
+
+        // Add item to cart
+        function addToCart(itemId) {
+            const item = menuItems.find(menuItem => menuItem.id === itemId);
+            const existingItem = cart.find(cartItem => cartItem.id === itemId);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    ...item,
+                    quantity: 1
+                });
+            }
+
+            updateCart();
+            showNotification(`${item.name} ditambahkan ke keranjang`);
+        }
+
+        // Remove item from cart
+        function removeFromCart(itemId) {
+            cart = cart.filter(item => item.id !== itemId);
+            updateCart();
+        }
+
+        // Update quantity of item in cart
+        function updateQuantity(itemId, change) {
+            const item = cart.find(cartItem => cartItem.id === itemId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(itemId);
+                } else {
+                    updateCart();
+                }
+            }
+        }
+
+        // Update cart UI
+        function updateCart() {
+            // Update cart count
+            const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+            cartCount.textContent = totalItems;
+
+            // Update cart items
+            if (cart.length === 0) {
+                cartItems.innerHTML = `
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <p>Keranjang belanja Anda kosong</p>
+                    </div>
+                `;
+                checkoutBtn.disabled = true;
+            } else {
+                cartItems.innerHTML = '';
+                cart.forEach(item => {
+                    const cartItemElement = document.createElement('div');
+                    cartItemElement.className = 'cart-item';
+                    cartItemElement.innerHTML = `
+                        <div class="cart-item-image" style="background-image: url('${item.image}')"></div>
+                        <div class="cart-item-details">
+                            <div class="cart-item-title">${item.name}</div>
+                            <div class="cart-item-price">Rp ${item.price.toLocaleString('id-ID')}</div>
+                            <div class="cart-item-controls">
+                                <button class="quantity-btn decrease" data-id="${item.id}">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <span class="cart-item-quantity">${item.quantity}</span>
+                                <button class="quantity-btn increase" data-id="${item.id}">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <button class="remove-item" data-id="${item.id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    cartItems.appendChild(cartItemElement);
+                });
+
+                // Add event listeners to cart item controls
+                document.querySelectorAll('.decrease').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const itemId = parseInt(this.dataset.id);
+                        updateQuantity(itemId, -1);
+                    });
+                });
+
+                document.querySelectorAll('.increase').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const itemId = parseInt(this.dataset.id);
+                        updateQuantity(itemId, 1);
+                    });
+                });
+
+                document.querySelectorAll('.remove-item').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const itemId = parseInt(this.dataset.id);
+                        removeFromCart(itemId);
+                    });
+                });
+
+                checkoutBtn.disabled = false;
+            }
+
+            // Update cart total
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            cartTotal.textContent = `Rp ${total.toLocaleString('id-ID')}`;
+        }
+
+        // Show notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background-color: var(--dark-green);
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 3000);
+        }
+
+        // Filter menu by category
+        function filterMenu(category) {
+            const menuItems = document.querySelectorAll('.menu-item');
+            
+            menuItems.forEach(item => {
+                if (category === 'all' || item.dataset.category === category) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Smooth scroll to section
+        function smoothScrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        // Initialize event listeners
+        function initializeEventListeners() {
+            // Cart toggle
+            cartBtn.addEventListener('click', () => {
+                cartSidebar.classList.add('active');
+            });
+
+            closeCartBtn.addEventListener('click', () => {
+                cartSidebar.classList.remove('active');
+            });
+
+            // Category tabs
+            categoryTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    categoryTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    const category = this.dataset.category;
+                    filterMenu(category);
+                });
+            });
+
+            // Checkout
+            checkoutBtn.addEventListener('click', () => {
+                if (cart.length > 0) {
+                    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                    paymentTotal.textContent = `Rp ${total.toLocaleString('id-ID')}`;
+                    cartSidebar.classList.remove('active');
+                    paymentModal.classList.add('active');
+                }
+            });
+
+            // Payment actions
+            cancelPaymentBtn.addEventListener('click', () => {
+                paymentModal.classList.remove('active');
+            });
+
+            confirmPaymentBtn.addEventListener('click', () => {
+                if (cart.length === 0) {
+                    alert('Keranjang belanja kosong!');
+                    return;
+                }
+
+                const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                alert(`Pembayaran sebesar Rp ${total.toLocaleString('id-ID')} berhasil dengan QRIS! Terima kasih atas pesanan Anda.`);
+                
+                // Reset cart and close modals
+                cart = [];
+                updateCart();
+                paymentModal.classList.remove('active');
+            });
+
+            // Order now button
+            orderNowBtn.addEventListener('click', () => {
+                smoothScrollToSection('menu');
+            });
+
+            // Navigation links
+            document.querySelectorAll('nav a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    smoothScrollToSection(targetId);
+                });
+            });
+        }
+
+        // Initialize the application
+        function init() {
+            initializeMenu();
+            initializeEventListeners();
+            updateCart();
+        }
+
+        // Start the application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
