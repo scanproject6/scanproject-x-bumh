@@ -545,6 +545,7 @@
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.3s, visibility 0.3s;
+            padding: 20px;
         }
 
         .payment-modal.active {
@@ -554,26 +555,49 @@
 
         .payment-content {
             background-color: var(--white);
-            width: 90%;
+            width: 100%;
             max-width: 450px;
+            max-height: 90vh;
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
         }
 
         .payment-header {
             background-color: var(--dark-green);
             color: var(--white);
             padding: 1.5rem;
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
         }
 
         .payment-header h3 {
             font-size: 1.3rem;
+            margin: 0;
+        }
+
+        .close-payment {
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .payment-body {
             padding: 2rem;
+            overflow-y: auto;
+            flex: 1;
         }
 
         .qris-container {
@@ -657,6 +681,7 @@
             display: flex;
             gap: 1rem;
             margin-top: 1.5rem;
+            flex-shrink: 0;
         }
 
         .payment-btn {
@@ -777,6 +802,15 @@
             .about-container,
             .contact-container {
                 grid-template-columns: 1fr;
+            }
+
+            .payment-content {
+                margin: 10px;
+                max-height: 95vh;
+            }
+
+            .payment-body {
+                padding: 1.5rem;
             }
         }
 
@@ -941,6 +975,9 @@
         <div class="payment-content">
             <div class="payment-header">
                 <h3>Pembayaran QRIS</h3>
+                <button class="close-payment" id="close-payment">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             <div class="payment-body">
                 <div class="payment-instruction">
@@ -1105,6 +1142,7 @@
         const cartCount = document.querySelector('.cart-count');
         const checkoutBtn = document.getElementById('checkout-btn');
         const paymentModal = document.getElementById('payment-modal');
+        const closePaymentBtn = document.getElementById('close-payment');
         const cancelPaymentBtn = document.getElementById('cancel-payment');
         const confirmPaymentBtn = document.getElementById('confirm-payment');
         const categoryTabs = document.querySelectorAll('.category-tab');
@@ -1356,7 +1394,7 @@
                     data: [{
                         "Timestamp": new Date().toLocaleString('id-ID'),
                         "Nama_Pelanggan": orderData.customerName,
-                        "Email": orderData.email,
+                        "NIM": orderData.nim,
                         "No_Telepon": orderData.phone,
                         "Items": orderData.items.map(item => `${item.name} (${item.quantity}x)`).join(', '),
                         "Total_Quantity": orderData.totalQuantity,
@@ -1398,6 +1436,24 @@
             confirmPaymentBtn.disabled = true;
         }
 
+        // Close payment modal when clicking outside
+        function setupModalClose() {
+            paymentModal.addEventListener('click', function(e) {
+                if (e.target === paymentModal) {
+                    paymentModal.classList.remove('active');
+                    resetPaymentForm();
+                }
+            });
+
+            // Close with escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && paymentModal.classList.contains('active')) {
+                    paymentModal.classList.remove('active');
+                    resetPaymentForm();
+                }
+            });
+        }
+
         // Initialize event listeners
         function initializeEventListeners() {
             // Cart toggle
@@ -1434,6 +1490,11 @@
             paymentProofInput.addEventListener('change', handleFileUpload);
 
             // Payment actions
+            closePaymentBtn.addEventListener('click', () => {
+                paymentModal.classList.remove('active');
+                resetPaymentForm();
+            });
+
             cancelPaymentBtn.addEventListener('click', () => {
                 paymentModal.classList.remove('active');
                 resetPaymentForm();
@@ -1450,10 +1511,16 @@
                     return;
                 }
 
-                // Minta data pelanggan
+                // Minta data pelanggan - GANTI EMAIL DENGAN NIM
                 const customerName = prompt('Masukkan nama Anda:') || 'Guest';
-                const email = prompt('Masukkan email Anda (opsional):') || '';
+                const nim = prompt('Masukkan NIM Anda:') || '';
                 const phone = prompt('Masukkan nomor telepon Anda (opsional):') || '';
+
+                // Validasi NIM
+                if (!nim) {
+                    alert('NIM harus diisi!');
+                    return;
+                }
 
                 const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
                 const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -1461,7 +1528,7 @@
                 // Data yang akan dikirim ke Google Sheets
                 const orderData = {
                     customerName: customerName,
-                    email: email,
+                    nim: nim,
                     phone: phone,
                     items: cart,
                     totalQuantity: totalQuantity,
@@ -1476,7 +1543,7 @@
                     const result = await saveOrderToSheet(orderData);
 
                     if (result.success) {
-                        alert(`✅ Pembayaran sebesar Rp ${total.toLocaleString('id-ID')} berhasil!\nTerima kasih atas pesanan Anda, ${customerName}.\nPesanan menunggu verifikasi pembayaran.`);
+                        alert(`✅ Pembayaran sebesar Rp ${total.toLocaleString('id-ID')} berhasil!\nTerima kasih atas pesanan Anda, ${customerName} (NIM: ${nim}).\nPesanan menunggu verifikasi pembayaran.`);
                         
                         // Reset cart dan close modals
                         cart = [];
@@ -1509,6 +1576,9 @@
                     smoothScrollToSection(targetId);
                 });
             });
+
+            // Setup modal close functionality
+            setupModalClose();
         }
 
         // Initialize the application
@@ -1527,4 +1597,3 @@
     </script>
 </body>
 </html>
-
