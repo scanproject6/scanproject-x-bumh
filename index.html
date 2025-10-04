@@ -1146,7 +1146,7 @@
         // KONFIGURASI SHEETDB - YANG HARUS ANDA UBAH!
         // =============================================
         // GANTI URL DI BAWAH INI DENGAN API URL ANDA DARI SHEETDB
-        const SHEETDB_API_URL = 'https://sheetdb.io/api/v1/XXXXXXXXXXXX';
+        const SHEETDB_API_URL = 'https://sheetdb.io/api/v1/jeyohnagae4gl';
 
         // =============================================
         // JANGAN UBAH KODE DI BAWAH INI
@@ -1406,50 +1406,59 @@
         }
 
         // Save order to Google Sheets via SheetDB
-        async function saveOrderToSheet(orderData) {
-            try {
-                let proofBase64 = '';
-                if (paymentProofFile) {
-                    proofBase64 = await fileToBase64(paymentProofFile);
-                }
-
-                // Format data untuk SheetDB
-                const sheetData = {
-                    data: [{
-                        "Timestamp": new Date().toLocaleString('id-ID'),
-                        "Nama_Pelanggan": orderData.customerName,
-                        "NIM": orderData.nim,
-                        "No_Telepon": orderData.phone,
-                        "Items": orderData.items.map(item => `${item.name} (${item.quantity}x)`).join(', '),
-                        "Total_Quantity": orderData.totalQuantity,
-                        "Total_Harga": orderData.totalPrice,
-                        "Status_Pembayaran": "Menunggu Verifikasi",
-                        "Metode_Pembayaran": "QRIS",
-                        "Bukti_Pembayaran": proofBase64.substring(0, 100) + "...", // Simpan sebagian base64
-                        "File_Name": paymentProofFile ? paymentProofFile.name : 'Tidak ada'
-                    }]
-                };
-
-                console.log('Sending data to SheetDB:', sheetData);
-
-                const response = await fetch(SHEETDB_API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(sheetData)
-                });
-
-                const result = await response.json();
-                console.log('SheetDB response:', result);
-                
-                return { success: true, message: 'Data berhasil disimpan' };
-                
-            } catch (error) {
-                console.error('Error saving to SheetDB:', error);
-                return { success: false, message: error.toString() };
-            }
+async function saveOrderToSheet(orderData) {
+    try {
+        let proofBase64 = '';
+        if (paymentProofFile) {
+            proofBase64 = await fileToBase64(paymentProofFile);
         }
+
+        // Format items untuk ditampilkan lebih rapi
+        const itemsString = orderData.items.map(item => 
+            `${item.name} (${item.quantity}x) - Rp ${(item.price * item.quantity).toLocaleString('id-ID')}`
+        ).join('; ');
+
+        // Format data untuk SheetDB - SESUAIKAN DENGAN NAMA KOLOM DI GOOGLE SHEETS ANDA
+        const sheetData = {
+            data: [{
+                "Timestamp": new Date().toISOString(),
+                "Nama": orderData.customerName,
+                "NIM": orderData.nim,
+                "No_Telepon": orderData.phone,
+                "Items": itemsString,
+                "Total_Quantity": orderData.totalQuantity,
+                "Total_Harga": `Rp ${orderData.totalPrice.toLocaleString('id-ID')}`,
+                "Status": "Menunggu Verifikasi",
+                "Metode_Pembayaran": "QRIS",
+                "Bukti_Pembayaran": proofBase64 ? "Ada" : "Tidak Ada",
+                "File_Name": paymentProofFile ? paymentProofFile.name : 'Tidak ada'
+            }]
+        };
+
+        console.log('Sending data to SheetDB:', sheetData);
+
+        const response = await fetch(SHEETDB_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(sheetData)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('SheetDB response:', result);
+        
+        return { success: true, message: 'Data berhasil disimpan' };
+        
+    } catch (error) {
+        console.error('Error saving to SheetDB:', error);
+        return { success: false, message: error.toString() };
+    }
+}
 
         // Reset payment form
         function resetPaymentForm() {
@@ -1621,6 +1630,7 @@
     </script>
 </body>
 </html>
+
 
 
 
