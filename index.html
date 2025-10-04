@@ -1038,15 +1038,12 @@
                 <a href="#about">About Us</a>
                 <a href="#contact">Contact</a>
             </div>
-            <div class="footer-section">
-                <h3>Follow Us</h3>
-                <div class="social-links">
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-facebook"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-tiktok"></i></a>
-                </div>
-            </div>
+<div class="footer-section">
+    <h3>Follow Us</h3>
+    <div class="social-links">
+        <a href="https://instagram.com/scanproject6" target="_blank"><i class="fab fa-instagram"></i></a>
+    </div>
+</div>
         </div>
         <div class="footer-bottom">
             <p>&copy; 2025 SCAN Project. All rights reserved.</p>
@@ -1142,10 +1139,6 @@
             }
         ];
 
-        // =============================================
-        // KONFIGURASI SHEETDB - YANG HARUS ANDA UBAH!
-        // =============================================
-        // GANTI URL DI BAWAH INI DENGAN API URL ANDA DARI SHEETDB
         const SHEETDB_API_URL = 'https://sheetdb.io/api/v1/jeyohnagae4gl';
 
         // =============================================
@@ -1405,23 +1398,39 @@
             });
         }
 
-        // Save order to Google Sheets via SheetDB
+       // Save order to Google Sheets via SheetDB
 async function saveOrderToSheet(orderData) {
     try {
         let proofBase64 = '';
+        let fileName = 'Tidak ada';
+
         if (paymentProofFile) {
             proofBase64 = await fileToBase64(paymentProofFile);
+            fileName = paymentProofFile.name;
         }
 
-        // Format items untuk ditampilkan lebih rapi
+        // Format timestamp WIB
+        const now = new Date();
+        const options = { 
+            timeZone: 'Asia/Jakarta',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        };
+        const timestamp = now.toLocaleString('id-ID', options);
+
+        // Format items
         const itemsString = orderData.items.map(item => 
             `${item.name} (${item.quantity}x) - Rp ${(item.price * item.quantity).toLocaleString('id-ID')}`
         ).join('; ');
 
-        // Format data untuk SheetDB - SESUAIKAN DENGAN NAMA KOLOM DI GOOGLE SHEETS ANDA
+        // Data untuk SheetDB
         const sheetData = {
             data: [{
-                "Timestamp": new Date().toISOString(),
+                "Timestamp": timestamp,
                 "Nama": orderData.customerName,
                 "NIM": orderData.nim,
                 "No_Telepon": orderData.phone,
@@ -1430,12 +1439,12 @@ async function saveOrderToSheet(orderData) {
                 "Total_Harga": `Rp ${orderData.totalPrice.toLocaleString('id-ID')}`,
                 "Status": "Menunggu Verifikasi",
                 "Metode_Pembayaran": "QRIS",
-                "Bukti_Pembayaran": proofBase64 ? "Ada" : "Tidak Ada",
-                "File_Name": paymentProofFile ? paymentProofFile.name : 'Tidak ada'
+                "Bukti_Pembayaran": proofBase64,
+                "File_Name": fileName
             }]
         };
 
-        console.log('Sending data to SheetDB:', sheetData);
+        console.log('Mengirim data ke SheetDB...');
 
         const response = await fetch(SHEETDB_API_URL, {
             method: 'POST',
@@ -1450,12 +1459,12 @@ async function saveOrderToSheet(orderData) {
         }
 
         const result = await response.json();
-        console.log('SheetDB response:', result);
+        console.log('Data berhasil dikirim ke SheetDB');
         
         return { success: true, message: 'Data berhasil disimpan' };
         
     } catch (error) {
-        console.error('Error saving to SheetDB:', error);
+        console.error('Error menyimpan ke SheetDB:', error);
         return { success: false, message: error.toString() };
     }
 }
@@ -1630,6 +1639,7 @@ async function saveOrderToSheet(orderData) {
     </script>
 </body>
 </html>
+
 
 
 
