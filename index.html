@@ -52,16 +52,20 @@
         .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
-        .logo i {
-            font-size: 1.8rem;
+        /* Logo BUMH Styles */
+        .logo-image {
+            height: 45px;
+            width: auto;
+            object-fit: contain;
         }
 
         .logo h1 {
             font-size: 1.5rem;
             font-weight: 700;
+            color: var(--white);
         }
 
         nav ul {
@@ -134,7 +138,7 @@
 
         /* Hero Section */
         .hero {
-            background: linear-gradient(rgba(26, 71, 42, 0.8), rgba(26, 71, 42, 0.9)), url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80');
+            background: linear-gradient(rgba(26, 71, 42, 0.8), rgba(26, 71, 42, 0.9)), url('images/hero-background.jpg');
             background-size: cover;
             background-position: center;
             color: var(--white);
@@ -812,6 +816,10 @@
             .payment-body {
                 padding: 1.5rem;
             }
+
+            .logo-image {
+                height: 35px;
+            }
         }
 
         /* Animations */
@@ -842,7 +850,8 @@
     <header>
         <div class="header-container">
             <div class="logo">
-                <i class="fas fa-utensils"></i>
+                <!-- LOGO BUMH dari folder images -->
+                <img src="images/logo-bumh.png" alt="BUMH Logo" class="logo-image">
                 <h1>SCAN Canteen</h1>
             </div>
             <nav>
@@ -876,7 +885,8 @@
     <section class="about-section" id="about">
         <div class="about-container">
             <div class="about-image">
-                <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80" alt="SCAN Canteen">
+                <!-- Gambar tentang kami dari folder images -->
+                <img src="images/about-canteen.jpg" alt="SCAN Canteen">
             </div>
             <div class="about-content">
                 <h2 class="section-title">Tentang SCAN Canteen</h2>
@@ -939,8 +949,9 @@
             </div>
             <div class="contact-info">
                 <h3>Lokasi Kami</h3>
-                <div class="map-placeholder" style="background: linear-gradient(45deg, var(--light-gray), var(--gray)); height: 300px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--dark-green); font-weight: bold;">
-                    Peta Lokasi SCAN Canteen
+                <!-- Peta lokasi dari folder images -->
+                <div class="map-placeholder" style="background: #f5f5f5; height: 300px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--dark-green); font-weight: bold; overflow: hidden;">
+                    <img src="images/location-map.jpg" alt="Peta Lokasi" style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
             </div>
         </div>
@@ -984,10 +995,8 @@
                     <p>Scan QR code di bawah ini untuk melakukan pembayaran</p>
                 </div>
                 <div class="qris-container">
-                    <!-- GANTI DENGAN QR CODE ANDA -->
-                    <div class="qris-code" style="background: linear-gradient(45deg, var(--dark-green), var(--light-green)); width: 200px; height: 200px; margin: 0 auto; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
-                        QRIS CODE
-                    </div>
+                    <!-- QRIS Code dari folder images -->
+                    <img src="images/qris-code.jpg" alt="QRIS Code" class="qris-image">
                 </div>
                 <div class="payment-instruction">
                     <p><strong>Total: <span id="payment-total">Rp 0</span></strong></p>
@@ -1050,7 +1059,7 @@
         // BAGIAN INI YANG BISA ANDA UBAH-UBAH
         // =============================================
         
-        // Sample menu data - UBAH MENU DI SINI
+        // Sample menu data - MENGGUNAKAN GAMBAR DARI FOLDER
         const menuItems = [
             {
                 id: 1,
@@ -1058,7 +1067,7 @@
                 description: "Nasi goreng dengan ayam, udang, dan sayuran segar",
                 price: 25000,
                 category: "makanan",
-                image: "https://images.unsplash.com/photo-1630919554028-3a9ec150e58b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
+                image: "images/nasi-goreng.jpg"
             },
             {
                 id: 2,
@@ -1066,7 +1075,7 @@
                 description: "Mie ayam dengan bakso sapi pilihan dan pangsit goreng",
                 price: 20000,
                 category: "makanan",
-                image: "https://images.unsplash.com/photo-1612927601601-6638404737ce?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
+                image: "images/mie-ayam.jpg"
             },
             {
                 id: 3,
@@ -1074,7 +1083,7 @@
                 description: "Ayam crispy dengan sambal bawang yang pedas menggoda",
                 price: 22000,
                 category: "makanan",
-                image: "https://images.unsplash.com/photo-1562967914-608f82629710?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1173&q=80"
+                image: "images/ayam-geprek.jpg"
             },
             {
                 id: 4,
@@ -1082,7 +1091,7 @@
                 description: "Es teh segar dengan gula pasir pilihan",
                 price: 8000,
                 category: "minuman",
-                image: "https://images.unsplash.com/photo-1597481499750-3e11b3df0da4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
+                image: "images/es-teh.jpg"
             },
             {
                 id: 5,
@@ -1090,7 +1099,7 @@
                 description: "Jus alpukat segar dengan susu dan gula aren",
                 price: 15000,
                 category: "minuman",
-                image: "https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=686&q=80"
+                image: "images/jus-alpukat.jpg"
             },
             {
                 id: 6,
@@ -1098,7 +1107,7 @@
                 description: "Kopi dengan susu steamed yang creamy",
                 price: 18000,
                 category: "minuman",
-                image: "https://images.unsplash.com/photo-1572442388796-11668a67e53d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=715&q=80"
+                image: "images/kopi-latte.jpg"
             },
             {
                 id: 7,
@@ -1106,7 +1115,7 @@
                 description: "Kentang goreng renyah dengan saus tomat dan mayones",
                 price: 12000,
                 category: "snack",
-                image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
+                image: "images/kentang-goreng.jpg"
             },
             {
                 id: 8,
@@ -1114,7 +1123,7 @@
                 description: "Pisang goreng crispy dengan taburan gula dan keju",
                 price: 10000,
                 category: "snack",
-                image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
+                image: "images/pisang-goreng.jpg"
             }
         ];
 
@@ -1122,7 +1131,7 @@
         // KONFIGURASI SHEETDB - YANG HARUS ANDA UBAH!
         // =============================================
         // GANTI URL DI BAWAH INI DENGAN API URL ANDA DARI SHEETDB
-        const SHEETDB_API_URL = 'https://sheetdb.io/api/v1/jeyohnagae4gl';
+        const SHEETDB_API_URL = 'https://sheetdb.io/api/v1/XXXXXXXXXXXX';
 
         // =============================================
         // JANGAN UBAH KODE DI BAWAH INI
