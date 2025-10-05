@@ -1051,13 +1051,13 @@
     </footer>
 
     <script>
-        // =============================================
-        // BAGIAN INI YANG BISA ANDA UBAH-UBAH
-        // =============================================
-        
-        // Sample menu data - MENGGUNAKAN GAMBAR DARI FOLDER
-        const menuItems = [
-            {
+    // =============================================
+    // BAGIAN INI YANG BISA ANDA UBAH-UBAH
+    // =============================================
+    
+    // Sample menu data - MENGGUNAKAN GAMBAR DARI FOLDER
+    const menuItems = [
+       {
                 id: 1,
                 name: "Khong guan stchese",
                 description: "Biskuit crackers asin dengan rasa kejunya yang gurih dan nikmat",
@@ -1139,474 +1139,501 @@
             }
         ];
 
-        const SHEETDB_API_URL = 'https://script.google.com/macros/s/AKfycbxilTxyh_dfWqmxGlA8kz9CGOOASSJhkHs8rPOBY-anLe-yoL_1TNogslI-L2N685Spbg/exec';
+    // URL Google Apps Script Web App - PASTIKAN INI BENAR
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxilTxyh_dfWqmxGlA8kz9CGOOASSJhkHs8rPOBY-anLe-yoL_1TNogslI-L2N685Spbg/exec';
 
-        // =============================================
-        // JANGAN UBAH KODE DI BAWAH INI
-        // =============================================
+    // =============================================
+    // JANGAN UBAH KODE DI BAWAH INI
+    // =============================================
 
-        // Cart functionality
-        let cart = [];
-        let paymentProofFile = null;
+    // Cart functionality
+    let cart = [];
+    let paymentProofFile = null;
 
-        // DOM Elements
-        const menuGrid = document.getElementById('menu-grid');
-        const cartBtn = document.getElementById('cart-btn');
-        const closeCartBtn = document.getElementById('close-cart');
-        const cartSidebar = document.getElementById('cart-sidebar');
-        const cartItems = document.getElementById('cart-items');
-        const cartTotal = document.getElementById('cart-total');
-        const cartCount = document.querySelector('.cart-count');
-        const checkoutBtn = document.getElementById('checkout-btn');
-        const paymentModal = document.getElementById('payment-modal');
-        const closePaymentBtn = document.getElementById('close-payment');
-        const cancelPaymentBtn = document.getElementById('cancel-payment');
-        const confirmPaymentBtn = document.getElementById('confirm-payment');
-        const categoryTabs = document.querySelectorAll('.category-tab');
-        const orderNowBtn = document.getElementById('order-now');
-        const paymentTotal = document.getElementById('payment-total');
-        const paymentProofInput = document.getElementById('payment-proof');
-        const fileNameDisplay = document.getElementById('file-name');
-        const previewImage = document.getElementById('preview-image');
+    // DOM Elements (tetap sama)
+    const menuGrid = document.getElementById('menu-grid');
+    const cartBtn = document.getElementById('cart-btn');
+    const closeCartBtn = document.getElementById('close-cart');
+    const cartSidebar = document.getElementById('cart-sidebar');
+    const cartItems = document.getElementById('cart-items');
+    const cartTotal = document.getElementById('cart-total');
+    const cartCount = document.querySelector('.cart-count');
+    const checkoutBtn = document.getElementById('checkout-btn');
+    const paymentModal = document.getElementById('payment-modal');
+    const closePaymentBtn = document.getElementById('close-payment');
+    const cancelPaymentBtn = document.getElementById('cancel-payment');
+    const confirmPaymentBtn = document.getElementById('confirm-payment');
+    const categoryTabs = document.querySelectorAll('.category-tab');
+    const orderNowBtn = document.getElementById('order-now');
+    const paymentTotal = document.getElementById('payment-total');
+    const paymentProofInput = document.getElementById('payment-proof');
+    const fileNameDisplay = document.getElementById('file-name');
+    const previewImage = document.getElementById('preview-image');
 
-        // Initialize the menu
-        function initializeMenu() {
-            menuGrid.innerHTML = '';
-            menuItems.forEach(item => {
-                const menuItemElement = document.createElement('div');
-                menuItemElement.className = 'menu-item';
-                menuItemElement.dataset.category = item.category;
-                menuItemElement.innerHTML = `
-                    <div class="menu-item-image" style="background-image: url('${item.image}')"></div>
-                    <div class="menu-item-content">
-                        <h3 class="menu-item-title">${item.name}</h3>
-                        <p class="menu-item-description">${item.description}</p>
-                        <div class="menu-item-footer">
-                            <span class="menu-item-price">Rp ${item.price.toLocaleString('id-ID')}</span>
-                            <button class="add-to-cart" data-id="${item.id}">
+    // Format items untuk dikirim ke Google Sheets
+    function formatItemsForSheet(items) {
+        return items.map(item => 
+            `${item.name} (${item.quantity} x Rp ${item.price.toLocaleString('id-ID')})`
+        ).join('; ');
+    }
+
+    // Save order to Google Sheets via Google Apps Script
+    async function saveOrderToSheet(orderData) {
+        try {
+            // Format data untuk dikirim
+            const formattedData = {
+                timestamp: new Date().toLocaleString('id-ID'),
+                customerName: orderData.customerName,
+                nim: orderData.nim,
+                phone: orderData.phone || '-',
+                items: formatItemsForSheet(orderData.items),
+                totalQuantity: orderData.totalQuantity.toString(),
+                totalPrice: `Rp ${orderData.totalPrice.toLocaleString('id-ID')}`,
+                status: 'Menunggu Verifikasi',
+                paymentProof: 'Telah Diupload'
+            };
+
+            console.log('📤 Mengirim data ke Google Sheets:', formattedData);
+
+            // Menggunakan FormData untuk kompatibilitas yang lebih baik
+            const formData = new FormData();
+            
+            // Tambahkan semua data sebagai string JSON
+            formData.append('data', JSON.stringify(formattedData));
+            
+            // Jika ada file bukti pembayaran, tambahkan juga
+            if (paymentProofFile) {
+                formData.append('file', paymentProofFile);
+            }
+
+            // Kirim data ke Google Apps Script
+            const response = await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                body: formData
+            });
+
+            // Handle response
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.text();
+            console.log('📥 Response dari server:', result);
+
+            // Coba parse JSON, jika gagal anggap sebagai success
+            try {
+                const jsonResult = JSON.parse(result);
+                return jsonResult;
+            } catch (e) {
+                // Jika response bukan JSON, anggap berhasil
+                return { 
+                    success: true, 
+                    message: 'Data berhasil disimpan' 
+                };
+            }
+            
+        } catch (error) {
+            console.error('❌ Error mengirim data:', error);
+            return { 
+                success: false, 
+                message: 'Gagal mengirim data: ' + error.message 
+            };
+        }
+    }
+
+    // Initialize the menu (tetap sama)
+    function initializeMenu() {
+        menuGrid.innerHTML = '';
+        menuItems.forEach(item => {
+            const menuItemElement = document.createElement('div');
+            menuItemElement.className = 'menu-item';
+            menuItemElement.dataset.category = item.category;
+            menuItemElement.innerHTML = `
+                <div class="menu-item-image" style="background-image: url('${item.image}')"></div>
+                <div class="menu-item-content">
+                    <h3 class="menu-item-title">${item.name}</h3>
+                    <p class="menu-item-description">${item.description}</p>
+                    <div class="menu-item-footer">
+                        <span class="menu-item-price">Rp ${item.price.toLocaleString('id-ID')}</span>
+                        <button class="add-to-cart" data-id="${item.id}">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            menuGrid.appendChild(menuItemElement);
+        });
+
+        // Add event listeners to add-to-cart buttons
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', function() {
+                const itemId = parseInt(this.dataset.id);
+                addToCart(itemId);
+            });
+        });
+    }
+
+    // Add item to cart (tetap sama)
+    function addToCart(itemId) {
+        const item = menuItems.find(menuItem => menuItem.id === itemId);
+        const existingItem = cart.find(cartItem => cartItem.id === itemId);
+
+        if (existingItem) {
+            existingItem.quantity += 1;
+        } else {
+            cart.push({
+                ...item,
+                quantity: 1
+            });
+        }
+
+        updateCart();
+        showNotification(`${item.name} ditambahkan ke keranjang`);
+    }
+
+    // Remove item from cart (tetap sama)
+    function removeFromCart(itemId) {
+        cart = cart.filter(item => item.id !== itemId);
+        updateCart();
+    }
+
+    // Update quantity of item in cart (tetap sama)
+    function updateQuantity(itemId, change) {
+        const item = cart.find(cartItem => cartItem.id === itemId);
+        if (item) {
+            item.quantity += change;
+            if (item.quantity <= 0) {
+                removeFromCart(itemId);
+            } else {
+                updateCart();
+            }
+        }
+    }
+
+    // Update cart UI (tetap sama)
+    function updateCart() {
+        // Update cart count
+        const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+        cartCount.textContent = totalItems;
+
+        // Update cart items
+        if (cart.length === 0) {
+            cartItems.innerHTML = `
+                <div class="empty-cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <p>Keranjang belanja Anda kosong</p>
+                </div>
+            `;
+            checkoutBtn.disabled = true;
+        } else {
+            cartItems.innerHTML = '';
+            cart.forEach(item => {
+                const cartItemElement = document.createElement('div');
+                cartItemElement.className = 'cart-item';
+                cartItemElement.innerHTML = `
+                    <div class="cart-item-image" style="background-image: url('${item.image}')"></div>
+                    <div class="cart-item-details">
+                        <div class="cart-item-title">${item.name}</div>
+                        <div class="cart-item-price">Rp ${item.price.toLocaleString('id-ID')}</div>
+                        <div class="cart-item-controls">
+                            <button class="quantity-btn decrease" data-id="${item.id}">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <span class="cart-item-quantity">${item.quantity}</span>
+                            <button class="quantity-btn increase" data-id="${item.id}">
                                 <i class="fas fa-plus"></i>
+                            </button>
+                            <button class="remove-item" data-id="${item.id}">
+                                <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
                 `;
-                menuGrid.appendChild(menuItemElement);
+                cartItems.appendChild(cartItemElement);
             });
 
-            // Add event listeners to add-to-cart buttons
-            document.querySelectorAll('.add-to-cart').forEach(button => {
+            // Add event listeners to cart item controls
+            document.querySelectorAll('.decrease').forEach(button => {
                 button.addEventListener('click', function() {
                     const itemId = parseInt(this.dataset.id);
-                    addToCart(itemId);
+                    updateQuantity(itemId, -1);
                 });
             });
-        }
 
-        // Add item to cart
-        function addToCart(itemId) {
-            const item = menuItems.find(menuItem => menuItem.id === itemId);
-            const existingItem = cart.find(cartItem => cartItem.id === itemId);
-
-            if (existingItem) {
-                existingItem.quantity += 1;
-            } else {
-                cart.push({
-                    ...item,
-                    quantity: 1
+            document.querySelectorAll('.increase').forEach(button => {
+                button.addEventListener('click', function() {
+                    const itemId = parseInt(this.dataset.id);
+                    updateQuantity(itemId, 1);
                 });
-            }
+            });
 
-            updateCart();
-            showNotification(`${item.name} ditambahkan ke keranjang`);
-        }
-
-        // Remove item from cart
-        function removeFromCart(itemId) {
-            cart = cart.filter(item => item.id !== itemId);
-            updateCart();
-        }
-
-        // Update quantity of item in cart
-        function updateQuantity(itemId, change) {
-            const item = cart.find(cartItem => cartItem.id === itemId);
-            if (item) {
-                item.quantity += change;
-                if (item.quantity <= 0) {
+            document.querySelectorAll('.remove-item').forEach(button => {
+                button.addEventListener('click', function() {
+                    const itemId = parseInt(this.dataset.id);
                     removeFromCart(itemId);
-                } else {
-                    updateCart();
-                }
-            }
-        }
-
-        // Update cart UI
-        function updateCart() {
-            // Update cart count
-            const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
-            cartCount.textContent = totalItems;
-
-            // Update cart items
-            if (cart.length === 0) {
-                cartItems.innerHTML = `
-                    <div class="empty-cart">
-                        <i class="fas fa-shopping-cart"></i>
-                        <p>Keranjang belanja Anda kosong</p>
-                    </div>
-                `;
-                checkoutBtn.disabled = true;
-            } else {
-                cartItems.innerHTML = '';
-                cart.forEach(item => {
-                    const cartItemElement = document.createElement('div');
-                    cartItemElement.className = 'cart-item';
-                    cartItemElement.innerHTML = `
-                        <div class="cart-item-image" style="background-image: url('${item.image}')"></div>
-                        <div class="cart-item-details">
-                            <div class="cart-item-title">${item.name}</div>
-                            <div class="cart-item-price">Rp ${item.price.toLocaleString('id-ID')}</div>
-                            <div class="cart-item-controls">
-                                <button class="quantity-btn decrease" data-id="${item.id}">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <span class="cart-item-quantity">${item.quantity}</span>
-                                <button class="quantity-btn increase" data-id="${item.id}">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                                <button class="remove-item" data-id="${item.id}">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    cartItems.appendChild(cartItemElement);
                 });
-
-                // Add event listeners to cart item controls
-                document.querySelectorAll('.decrease').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const itemId = parseInt(this.dataset.id);
-                        updateQuantity(itemId, -1);
-                    });
-                });
-
-                document.querySelectorAll('.increase').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const itemId = parseInt(this.dataset.id);
-                        updateQuantity(itemId, 1);
-                    });
-                });
-
-                document.querySelectorAll('.remove-item').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const itemId = parseInt(this.dataset.id);
-                        removeFromCart(itemId);
-                    });
-                });
-
-                checkoutBtn.disabled = false;
-            }
-
-            // Update cart total
-            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            cartTotal.textContent = `Rp ${total.toLocaleString('id-ID')}`;
-        }
-
-        // Show notification
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.textContent = message;
-            notification.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                background-color: var(--dark-green);
-                color: white;
-                padding: 1rem 1.5rem;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                z-index: 10000;
-            `;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.parentNode.removeChild(notification);
-                }
-            }, 3000);
-        }
-
-        // Filter menu by category
-        function filterMenu(category) {
-            const menuItems = document.querySelectorAll('.menu-item');
-            
-            menuItems.forEach(item => {
-                if (category === 'all' || item.dataset.category === category) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
             });
+
+            checkoutBtn.disabled = false;
         }
 
-        // Smooth scroll to section
-        function smoothScrollToSection(sectionId) {
-            const section = document.getElementById(sectionId);
-            if (section) {
-                section.scrollIntoView({
-                    behavior: 'smooth'
-                });
-            }
-        }
-
-        // Handle file upload
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                paymentProofFile = file;
-                fileNameDisplay.textContent = file.name;
-                
-                // Show preview for images
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        previewImage.src = e.target.result;
-                        previewImage.style.display = 'block';
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    previewImage.style.display = 'none';
-                }
-                
-                // Enable confirm button
-                confirmPaymentBtn.disabled = false;
-            } else {
-                paymentProofFile = null;
-                fileNameDisplay.textContent = 'Belum ada file dipilih';
-                previewImage.style.display = 'none';
-                confirmPaymentBtn.disabled = true;
-            }
-        }
-
-        // Convert file to base64
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
-
-      // Save order to Google Sheets via Google Apps Script
-// ✅ GANTI FUNGSI DI ATAS DENGAN INI:
-async function saveOrderToSheet(orderData) {
-    try {
-        // Siapkan data untuk Google Apps Script
-        const postData = {
-            customerName: orderData.customerName || 'Guest',
-            nim: orderData.nim || '',
-            phone: orderData.phone || '',
-            items: orderData.items,
-            totalQuantity: orderData.totalQuantity,
-            totalPrice: orderData.totalPrice,
-            fileName: paymentProofFile ? paymentProofFile.name : 'Tidak ada'
-        };
-
-        console.log('📤 Mengirim data ke Google Apps Script:', postData);
-
-        // GANTI URL_DENGAN_WEB_APP_URL dengan URL dari deploy Google Apps Script
-        const response = await fetch('https://script.google.com/macros/s/AKfycbxilTxyh_dfWqmxGlA8kz9CGOOASSJhkHs8rPOBY-anLe-yoL_1TNogslI-L2N685Spbg/exec', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(postData)
-        });
-
-        const result = await response.json();
-        console.log('📥 Response dari Google Apps Script:', result);
-        
-        return result;
-        
-    } catch (error) {
-        console.error('❌ Error:', error);
-        return { 
-            success: false, 
-            message: 'Error: ' + error.message 
-        };
+        // Update cart total
+        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        cartTotal.textContent = `Rp ${total.toLocaleString('id-ID')}`;
     }
-}
-        // Reset payment form
-        function resetPaymentForm() {
+
+    // Show notification (tetap sama)
+    function showNotification(message) {
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.textContent = message;
+        notification.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--dark-green);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10000;
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 3000);
+    }
+
+    // Filter menu by category (tetap sama)
+    function filterMenu(category) {
+        const menuItems = document.querySelectorAll('.menu-item');
+        
+        menuItems.forEach(item => {
+            if (category === 'all' || item.dataset.category === category) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    // Smooth scroll to section (tetap sama)
+    function smoothScrollToSection(sectionId) {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+    }
+
+    // Handle file upload (tetap sama)
+    function handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (file) {
+            paymentProofFile = file;
+            fileNameDisplay.textContent = file.name;
+            
+            // Show preview for images
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewImage.style.display = 'none';
+            }
+            
+            // Enable confirm button
+            confirmPaymentBtn.disabled = false;
+        } else {
             paymentProofFile = null;
             fileNameDisplay.textContent = 'Belum ada file dipilih';
             previewImage.style.display = 'none';
-            paymentProofInput.value = '';
             confirmPaymentBtn.disabled = true;
         }
+    }
 
-        // Close payment modal when clicking outside
-        function setupModalClose() {
-            paymentModal.addEventListener('click', function(e) {
-                if (e.target === paymentModal) {
-                    paymentModal.classList.remove('active');
-                    resetPaymentForm();
-                }
-            });
+    // Reset payment form (tetap sama)
+    function resetPaymentForm() {
+        paymentProofFile = null;
+        fileNameDisplay.textContent = 'Belum ada file dipilih';
+        previewImage.style.display = 'none';
+        paymentProofInput.value = '';
+        confirmPaymentBtn.disabled = true;
+    }
 
-            // Close with escape key
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && paymentModal.classList.contains('active')) {
-                    paymentModal.classList.remove('active');
-                    resetPaymentForm();
-                }
-            });
-        }
-
-        // Initialize event listeners
-        function initializeEventListeners() {
-            // Cart toggle
-            cartBtn.addEventListener('click', () => {
-                cartSidebar.classList.add('active');
-            });
-
-            closeCartBtn.addEventListener('click', () => {
-                cartSidebar.classList.remove('active');
-            });
-
-            // Category tabs
-            categoryTabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    categoryTabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    const category = this.dataset.category;
-                    filterMenu(category);
-                });
-            });
-
-            // Checkout
-            checkoutBtn.addEventListener('click', () => {
-                if (cart.length > 0) {
-                    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                    paymentTotal.textContent = `Rp ${total.toLocaleString('id-ID')}`;
-                    cartSidebar.classList.remove('active');
-                    paymentModal.classList.add('active');
-                    resetPaymentForm();
-                }
-            });
-
-            // File upload
-            paymentProofInput.addEventListener('change', handleFileUpload);
-
-            // Payment actions
-            closePaymentBtn.addEventListener('click', () => {
+    // Close payment modal when clicking outside (tetap sama)
+    function setupModalClose() {
+        paymentModal.addEventListener('click', function(e) {
+            if (e.target === paymentModal) {
                 paymentModal.classList.remove('active');
                 resetPaymentForm();
-            });
+            }
+        });
 
-            cancelPaymentBtn.addEventListener('click', () => {
+        // Close with escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && paymentModal.classList.contains('active')) {
                 paymentModal.classList.remove('active');
                 resetPaymentForm();
+            }
+        });
+    }
+
+    // Initialize event listeners dengan perbaikan
+    function initializeEventListeners() {
+        // Cart toggle (tetap sama)
+        cartBtn.addEventListener('click', () => {
+            cartSidebar.classList.add('active');
+        });
+
+        closeCartBtn.addEventListener('click', () => {
+            cartSidebar.classList.remove('active');
+        });
+
+        // Category tabs (tetap sama)
+        categoryTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                categoryTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                const category = this.dataset.category;
+                filterMenu(category);
             });
+        });
 
-            confirmPaymentBtn.addEventListener('click', async () => {
-                if (cart.length === 0) {
-                    alert('Keranjang belanja kosong!');
-                    return;
-                }
-
-                if (!paymentProofFile) {
-                    alert('Silakan upload bukti pembayaran terlebih dahulu!');
-                    return;
-                }
-
-                // Minta data pelanggan - GANTI EMAIL DENGAN NIM
-                const customerName = prompt('Masukkan nama Anda:') || 'Guest';
-                const nim = prompt('Masukkan NIM Anda:') || '';
-                const phone = prompt('Masukkan nomor telepon Anda (opsional):') || '';
-
-                // Validasi NIM
-                if (!nim) {
-                    alert('NIM harus diisi!');
-                    return;
-                }
-
+        // Checkout (tetap sama)
+        checkoutBtn.addEventListener('click', () => {
+            if (cart.length > 0) {
                 const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
-                
-                // Data yang akan dikirim ke Google Sheets
-                const orderData = {
-                    customerName: customerName,
-                    nim: nim,
-                    phone: phone,
-                    items: cart,
-                    totalQuantity: totalQuantity,
-                    totalPrice: total
-                };
+                paymentTotal.textContent = `Rp ${total.toLocaleString('id-ID')}`;
+                cartSidebar.classList.remove('active');
+                paymentModal.classList.add('active');
+                resetPaymentForm();
+            }
+        });
 
-                // Tampilkan loading
-                confirmPaymentBtn.disabled = true;
-                confirmPaymentBtn.textContent = 'Menyimpan...';
+        // File upload (tetap sama)
+        paymentProofInput.addEventListener('change', handleFileUpload);
 
-                try {
-                    const result = await saveOrderToSheet(orderData);
+        // Payment actions - DIPERBAIKI
+        closePaymentBtn.addEventListener('click', () => {
+            paymentModal.classList.remove('active');
+            resetPaymentForm();
+        });
 
-                    if (result.success) {
-                        alert(`✅ Pembayaran sebesar Rp ${total.toLocaleString('id-ID')} berhasil!\nTerima kasih atas pesanan Anda, ${customerName} (NIM: ${nim}).\nPesanan menunggu verifikasi pembayaran.`);
-                        
-                        // Reset cart dan close modals
-                        cart = [];
-                        updateCart();
-                        paymentModal.classList.remove('active');
-                        resetPaymentForm();
-                    } else {
-                        alert('❌ Gagal menyimpan data pesanan. Silakan coba lagi.\nError: ' + result.message);
-                        confirmPaymentBtn.disabled = false;
-                        confirmPaymentBtn.textContent = 'Konfirmasi Pembayaran';
-                    }
-                } catch (error) {
-                    alert('❌ Terjadi kesalahan jaringan. Silakan coba lagi.');
-                    console.error('Payment error:', error);
-                    confirmPaymentBtn.disabled = false;
-                    confirmPaymentBtn.textContent = 'Konfirmasi Pembayaran';
-                }
-            });
+        cancelPaymentBtn.addEventListener('click', () => {
+            paymentModal.classList.remove('active');
+            resetPaymentForm();
+        });
 
-            // Order now button
-            orderNowBtn.addEventListener('click', () => {
-                smoothScrollToSection('menu');
-            });
+        confirmPaymentBtn.addEventListener('click', async () => {
+            if (cart.length === 0) {
+                alert('Keranjang belanja kosong!');
+                return;
+            }
 
-            // Navigation links
-            document.querySelectorAll('nav a').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const targetId = this.getAttribute('href').substring(1);
-                    smoothScrollToSection(targetId);
-                });
-            });
+            if (!paymentProofFile) {
+                alert('Silakan upload bukti pembayaran terlebih dahulu!');
+                return;
+            }
 
-            // Setup modal close functionality
-            setupModalClose();
-        }
+            // Minta data pelanggan
+            const customerName = prompt('Masukkan nama Anda:') || 'Guest';
+            const nim = prompt('Masukkan NIM Anda:') || '';
+            const phone = prompt('Masukkan nomor telepon Anda (opsional):') || '';
 
-        // Initialize the application
-        function init() {
-            initializeMenu();
-            initializeEventListeners();
-            updateCart();
+            // Validasi NIM
+            if (!nim) {
+                alert('NIM harus diisi!');
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
             
-            // Test connection to SheetDB
-            console.log('SCAN Canteen initialized');
-            console.log('SheetDB API URL:', SHEETDB_API_URL);
-        }
+            // Data yang akan dikirim ke Google Sheets
+            const orderData = {
+                customerName: customerName,
+                nim: nim,
+                phone: phone,
+                items: cart,
+                totalQuantity: totalQuantity,
+                totalPrice: total
+            };
 
-        // Start the application when DOM is loaded
-        document.addEventListener('DOMContentLoaded', init);
-    </script>
+            // Tampilkan loading
+            confirmPaymentBtn.disabled = true;
+            confirmPaymentBtn.textContent = 'Menyimpan...';
+
+            try {
+                const result = await saveOrderToSheet(orderData);
+
+                if (result.success) {
+                    alert(`✅ Pembayaran sebesar Rp ${total.toLocaleString('id-ID')} berhasil!\n\nTerima kasih atas pesanan Anda, ${customerName} (NIM: ${nim}).\nPesanan menunggu verifikasi pembayaran.`);
+                    
+                    // Reset cart dan close modals
+                    cart = [];
+                    updateCart();
+                    paymentModal.classList.remove('active');
+                    resetPaymentForm();
+                    
+                    // Reset button text
+                    confirmPaymentBtn.textContent = 'Konfirmasi Pembayaran';
+                    confirmPaymentBtn.disabled = false;
+                } else {
+                    alert('❌ Gagal menyimpan data pesanan. Silakan coba lagi.\n\nError: ' + result.message);
+                    confirmPaymentBtn.textContent = 'Konfirmasi Pembayaran';
+                    confirmPaymentBtn.disabled = false;
+                }
+            } catch (error) {
+                alert('❌ Terjadi kesalahan jaringan. Silakan coba lagi.\n\nError: ' + error.message);
+                console.error('Payment error:', error);
+                confirmPaymentBtn.textContent = 'Konfirmasi Pembayaran';
+                confirmPaymentBtn.disabled = false;
+            }
+        });
+
+        // Order now button (tetap sama)
+        orderNowBtn.addEventListener('click', () => {
+            smoothScrollToSection('menu');
+        });
+
+        // Navigation links (tetap sama)
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                smoothScrollToSection(targetId);
+            });
+        });
+
+        // Setup modal close functionality (tetap sama)
+        setupModalClose();
+    }
+
+    // Initialize the application
+    function init() {
+        initializeMenu();
+        initializeEventListeners();
+        updateCart();
+        
+        console.log('SCAN Canteen initialized');
+        console.log('Google Script URL:', GOOGLE_SCRIPT_URL);
+    }
+
+    // Start the application when DOM is loaded
+    document.addEventListener('DOMContentLoaded', init);
+</script>
 </body>
 </html>
+
 
 
 
